@@ -13,7 +13,7 @@
 void mark(BiTreeNode *n) {
     if (n == NULL) return;
 
-    _block_header *bh = (_block_header*) ((char*) n - sizeof(_block_header));
+    _block_header *bh = (_block_header*) ((void*) n - sizeof(_block_header));
 
     if (bh->marked) return;
     bh->marked = true;
@@ -35,9 +35,6 @@ void sweep() {
         _block_header *bhh = (_block_header*) bh;
 
         void* data = (void*)(bh + sizeof(_block_header));
-
-        //BiTreeNode *n = (BiTreeNode*) data;
-        //printf("\np-> %p,   data -> %d,   l -> %p,  r -> %p\n", n, n->data, n->left, n->right);
 
         if (!bhh->marked) {list_addlast(heap->freeb, data);}
 
