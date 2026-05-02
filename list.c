@@ -2,6 +2,7 @@
  * list.c
  */
 
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -103,6 +104,15 @@ void list_removelast(List* list) {
    }
    list->size = list->size - 1;
    return;
+}
+
+void list_removeall(List *list) {
+    int size = list->size;
+    for (int i = 0; i < size; i++) {
+        list_removefirst(list);
+    }
+
+    assert(list_isempty(list));
 }
 
 void list_print(List* list) {

@@ -3,6 +3,7 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "bistree.h"
 #include "heap.h"
@@ -22,14 +23,25 @@ void mark(BiTreeNode *n) {
 }
 
 void sweep() {
-    for (_block_header *bh = (_block_header*) heap->base;
-        (char*) bh < (char*) heap->base + heap->size;
-        bh = (_block_header*) ((char*) bh + sizeof(_block_header) +  bh->size))
-    {
-        void* data = (void*) ((char*) bh + sizeof(_block_header));
-        if (!bh->marked && !list_contains(heap->freeb, data)) list_addlast(heap->freeb, data);
+    list_removeall(heap->freeb);
 
-        bh->marked = false;
+    char* top = heap->top;
+    char* base = heap->base;
+
+    for (char *bh = base;
+        (char*) bh < top;
+        bh = bh + sizeof(_block_header) + ((_block_header*) bh)->size)
+    {
+        _block_header *bhh = (_block_header*) bh;
+
+        void* data = (void*)((char*) bh + sizeof(_block_header));
+
+        // BiTreeNode *n = (BiTreeNode*) data;
+        // printf("\np-> %p,   data -> %d,   l -> %p,  r -> %p\n", n, n->data, n->left, n->right);
+
+        if (!bhh->marked) list_addlast(heap->freeb, data);
+
+        bhh->marked = false;
     }
 }
 
@@ -43,9 +55,7 @@ void mark_sweep_gc(BisTree* roots) {
 
    printf("marking()...");
 
-   for (int i = 0; i < roots->size; i++) {
-       mark(roots[i].root);
-   }
+   for (int i = 0; i < roots->size; i++) mark(roots[i].root);
 
    /*
     * sweep phase:

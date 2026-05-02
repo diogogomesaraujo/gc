@@ -2,11 +2,13 @@
  * the heap
  */
 
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/mman.h>
 
 #include "heap.h"
+#include "bistree.h"
 #include "globals.h"
 #include "collector.h"
 #include "list.h"
@@ -40,11 +42,21 @@ void* my_malloc(unsigned int nbytes) {
     } else {
        printf("my_malloc: not enough space, performing GC...");
        heap->collector(roots);
+
        if ( list_isempty(heap->freeb) ) {
           printf("my_malloc: not enough space after GC...");
           return NULL;
        }
 
-       return list_getfirst(heap->freeb);
+       void *to_return = list_getfirst(heap->freeb);
+       list_removefirst(heap->freeb);
+
+       BiTreeNode *n = (BiTreeNode*) to_return;
+
+       n->data = 0;
+       n->left = NULL;
+       n->right = NULL;
+
+       return to_return;
     }
 }

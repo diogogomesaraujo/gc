@@ -39,6 +39,8 @@ void list_removefirst(List* list);
 
 void list_removelast(List* list);
 
+void list_removeall(List* list);
+
 void list_print(List* list);
 
 #endif
