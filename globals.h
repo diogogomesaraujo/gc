@@ -11,4 +11,6 @@
 BisTree*  roots;
 Heap*     heap;
 
+int max_roots;
+
 #endif

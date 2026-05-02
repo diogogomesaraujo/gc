@@ -47,7 +47,7 @@ BiTreeNode* bitreenode_insert(BiTreeNode* node, int data, BiTreeNode* at) {
 
 bool bistree_insert(BisTree* tree, int data) {
     BiTreeNode* at = (BiTreeNode*)my_malloc(sizeof(BiTreeNode));
-    printf("\nat-> p-> %p,   data -> %d,   l -> %p,  r -> %p\n", at, at->data, at->left, at->right);
+    //printf("\np-> %p,   data -> %d,   l -> %p,  r -> %p\n", at, at->data, at->left, at->right);
 
     if (bistree_lookup(tree, data))
         return false;
