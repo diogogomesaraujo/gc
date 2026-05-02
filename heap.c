@@ -48,9 +48,6 @@ void* my_malloc(unsigned int nbytes) {
           return NULL;
        }
 
-       void *to_return = list_getfirst(heap->freeb);
-       list_removefirst(heap->freeb);
-
-       return to_return;
+       return list_getfirst(heap->freeb);
     }
 }
