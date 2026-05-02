@@ -9,6 +9,7 @@
 #include "heap.h"
 #include "globals.h"
 #include "collector.h"
+#include "list.h"
 
 
 void heap_init(Heap* heap, unsigned int size, void (*collector)(BisTree*)){
@@ -36,14 +37,14 @@ void* my_malloc(unsigned int nbytes) {
        char *p = heap->top + sizeof(_block_header);
        heap->top = heap->top + sizeof(_block_header) + nbytes;
        return p;
-     } 
-     else {
+    } else {
        printf("my_malloc: not enough space, performing GC...");
        heap->collector(roots);
        if ( list_isempty(heap->freeb) ) {
           printf("my_malloc: not enough space after GC...");
           return NULL;
        }
+
        return list_getfirst(heap->freeb);
     }
 }

@@ -33,6 +33,8 @@ void* list_getlast(List* list);
 
 void* list_get(List* list, int index);
 
+bool list_contains(List* list, void* val);
+
 void list_removefirst(List* list);
 
 void list_removelast(List* list);

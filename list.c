@@ -74,6 +74,16 @@ void* list_get(List* list, int index) {
   return p->data;
 }
 
+bool list_contains_rec(ListNode *node, void *val) {
+    if (node == NULL) return false;
+    if (node->data == val) return true;
+    return list_contains_rec(node->next, val);
+}
+
+bool list_contains(List* list, void* val) {
+    return list_contains_rec(list->first, val);
+}
+
 void list_removefirst(List* list) {
    if(list_isempty(list))
       return;

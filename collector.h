@@ -5,6 +5,8 @@
 #ifndef COLLECTOR_H
 #define COLLECTOR_H
 
+void mark(BiTreeNode *n);
+
 void mark_sweep_gc(BisTree* roots);
 
 void mark_compact_gc(BisTree* roots);
