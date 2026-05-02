@@ -28,7 +28,6 @@ void sweep() {
     char* top = heap->top;
     char* base = heap->base;
 
-
     for (char *bh = base;
         (char*) bh < top;
         bh = bh + sizeof(_block_header) + ((_block_header*) bh)->size)

@@ -51,12 +51,6 @@ void* my_malloc(unsigned int nbytes) {
        void *to_return = list_getfirst(heap->freeb);
        list_removefirst(heap->freeb);
 
-       BiTreeNode *n = (BiTreeNode*) to_return;
-
-       n->data = 0;
-       n->left = NULL;
-       n->right = NULL;
-
        return to_return;
     }
 }

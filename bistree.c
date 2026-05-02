@@ -33,20 +33,21 @@ bool bistree_lookup(BisTree* tree, int data) {
 BiTreeNode* bitreenode_insert(BiTreeNode* node, int data, BiTreeNode* at) {
    if (node == NULL) {
        BiTreeNode* node = at;
-      node->data = data;
-      node->left = NULL;
-      node->right= NULL;
-      return node;
+       node->data = data;
+       node->left = NULL;
+       node->right= NULL;
+       return node;
     }
-    else if(data < node->data)
+   else if(data < node->data)
       node->left = bitreenode_insert(node->left, data, at);
-    else
+   else
       node->right= bitreenode_insert(node->right, data, at);
-    return node;
+   return node;
 }
 
 bool bistree_insert(BisTree* tree, int data) {
     BiTreeNode* at = (BiTreeNode*)my_malloc(sizeof(BiTreeNode));
+    if (at == NULL) return false;
     //printf("\np-> %p,   data -> %d,   l -> %p,  r -> %p\n", at, at->data, at->left, at->right);
 
     if (bistree_lookup(tree, data))
