@@ -25,18 +25,18 @@ void mark(BiTreeNode *n) {
 void sweep() {
     list_removeall(heap->freeb);
 
-    char* top = heap->top;
+    char* limit = heap->limit;
     char* base = heap->base;
 
     for (char *bh = base;
-        (char*) bh < top;
+        (char*) bh < limit;
         bh = bh + sizeof(_block_header) + ((_block_header*) bh)->size)
     {
         _block_header *bhh = (_block_header*) bh;
 
         void* data = (void*)(bh + sizeof(_block_header));
 
-        if (!bhh->marked) {list_addlast(heap->freeb, data);}
+        if (!bhh->marked) list_addlast(heap->freeb, data);
 
         bhh->marked = false;
     }
