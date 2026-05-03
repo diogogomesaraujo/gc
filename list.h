@@ -37,6 +37,8 @@ bool list_contains(List* list, void* val);
 
 void list_removefirst(List* list);
 
+void* list_popfirst(List* list);
+
 void list_removelast(List* list);
 
 void list_removeall(List* list);

@@ -2,6 +2,7 @@
  * collector.c
  */
 
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -13,7 +14,7 @@
 void mark(BiTreeNode *n) {
     if (n == NULL) return;
 
-    _block_header *bh = (_block_header*) ((void*) n - sizeof(_block_header));
+    _block_header *bh = (_block_header*) ((char*) n - sizeof(_block_header));
 
     if (bh->marked) return;
     bh->marked = true;
@@ -23,8 +24,6 @@ void mark(BiTreeNode *n) {
 }
 
 void sweep() {
-    list_removeall(heap->freeb);
-
     char* top = heap->top;
     char* base = heap->base;
 
@@ -36,7 +35,7 @@ void sweep() {
 
         void* data = (void*)(bh + sizeof(_block_header));
 
-        if (!bhh->marked) {list_addlast(heap->freeb, data);}
+        if (!bhh->marked) list_addfirst(heap->freeb, data);
 
         bhh->marked = false;
     }

@@ -93,6 +93,12 @@ void list_removefirst(List* list) {
    return;
 }
 
+void* list_popfirst(List* list) {
+    void* to_return = list_getfirst(list);
+    list_removefirst(list);
+    return to_return;
+}
+
 void list_removelast(List* list) {
    if (list->size == 1)
       list->first = NULL;

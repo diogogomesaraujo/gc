@@ -47,9 +47,9 @@ BiTreeNode* bitreenode_insert(BiTreeNode* node, int data, BiTreeNode* at) {
 
 bool bistree_insert(BisTree* tree, int data) {
     BiTreeNode* at = (BiTreeNode*)my_malloc(sizeof(BiTreeNode));
-    if (at == NULL) return false;
+    if (at == NULL) exit(0);
     if (bistree_lookup(tree, data))
-        return false;
+        return true;
     tree->root = bitreenode_insert(tree->root, data, at);
     tree->size = tree->size + 1;
     return true;

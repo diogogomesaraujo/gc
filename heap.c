@@ -40,14 +40,19 @@ void* my_malloc(unsigned int nbytes) {
        heap->top = heap->top + sizeof(_block_header) + nbytes;
        return p;
     } else {
-       printf("my_malloc: not enough space, performing GC...");
-       heap->collector(roots);
+        printf("my_malloc: not enough space in heap, checking freeb list...");
 
-       if ( list_isempty(heap->freeb) ) {
-          printf("my_malloc: not enough space after GC...");
-          return NULL;
-       }
+        if (!list_isempty(heap->freeb)) return list_popfirst(heap->freeb);
 
-       return list_getfirst(heap->freeb);
+        printf("my_malloc: not enough space, performing GC...");
+
+        heap->collector(roots);
+
+        if (list_isempty(heap->freeb)) {
+            printf("my_malloc: not enough space after GC...");
+            return NULL;
+        }
+
+       return list_popfirst(heap->freeb);
     }
 }
