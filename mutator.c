@@ -5,14 +5,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <signal.h>
-
-#include "bool.h"
 #include "heap.h"
-#include "list.h"
 #include "bistree.h"
 #include "globals.h"
 #include "collector.h"
+#include <time.h>
 
 #define  MAX_KEY_VALUE  1000
 #define  HEAP_SIZE      (2 * 1024)  /* 2 KByte */
@@ -21,6 +18,8 @@ Heap*    heap;      /* shared global variable */
 BisTree* roots;     /* shared global variable */
 
 int main(int argc, char** argv) {
+    int start = clock();
+
    /* initialize the main parameters */
    int threshold  = atoi(argv[1]);  /* an integer in (0,100) */
    max_roots  = atoi(argv[2]);  /* a positive integer */
@@ -60,5 +59,9 @@ int main(int argc, char** argv) {
    /* exit gracefully */
    heap_destroy(heap);
    free(roots);
+
+   double t = clock() - start;
+   printf("\ntook %fs\n", t / CLOCKS_PER_SEC);
+
    return 0;
 }

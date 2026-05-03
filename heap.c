@@ -10,7 +10,6 @@
 #include "heap.h"
 #include "bistree.h"
 #include "globals.h"
-#include "collector.h"
 #include "list.h"
 
 
@@ -41,6 +40,15 @@ void* my_malloc(unsigned int nbytes) {
        return p;
     } else {
        printf("my_malloc: not enough space, performing GC...");
+
+       void *to_return;
+
+       if ( !list_isempty(heap->freeb) ) {
+           to_return = list_getfirst(heap->freeb);
+           list_removefirst(heap->freeb);
+           return list_getfirst(heap->freeb);
+       }
+
        heap->collector(roots);
 
        if ( list_isempty(heap->freeb) ) {
@@ -48,6 +56,9 @@ void* my_malloc(unsigned int nbytes) {
           return NULL;
        }
 
-       return list_getfirst(heap->freeb);
+       list_removefirst(heap->freeb);
+       to_return = list_getfirst(heap->freeb);
+
+       return to_return;
     }
 }

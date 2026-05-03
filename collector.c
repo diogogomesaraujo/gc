@@ -23,9 +23,7 @@ void mark(BiTreeNode *n) {
 }
 
 void sweep() {
-    list_removeall(heap->freeb);
-
-    char* limit = heap->limit;
+    char* limit = heap->top;
     char* base = heap->base;
 
     for (char *bh = base;
@@ -36,7 +34,9 @@ void sweep() {
 
         void* data = (void*)(bh + sizeof(_block_header));
 
-        if (!bhh->marked) list_addlast(heap->freeb, data);
+        if (!bhh->marked) {
+            list_addlast(heap->freeb, data);
+        };
 
         bhh->marked = false;
     }
@@ -69,12 +69,16 @@ void mark_sweep_gc(BisTree* roots) {
  }
 
 void mark_compact_gc(BisTree* roots) {
-   /*
-    * mark phase:
-    * go throught all roots,
-    * traverse trees,
-    * mark reachable
-    */
+    /*
+     * mark phase
+     * - every object has live bit set to 0
+     * - start from GC roots
+     * - traverse graph, set bit to 1 for every object visited
+     */
+
+   printf("marking()...");
+
+   for (int i = 0; i < max_roots; i++) mark(roots[i].root);
 
    /*
     * compact phase:
