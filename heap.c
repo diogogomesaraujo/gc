@@ -41,11 +41,6 @@ void* my_malloc(unsigned int nbytes) {
        return p;
     } else {
        printf("my_malloc: not enough space, performing GC...");
-
-       if ( !list_isempty(heap->freeb) ) {
-           return list_popfirst(heap->freeb);
-       }
-
        heap->collector(roots);
 
        if ( list_isempty(heap->freeb) ) {
@@ -53,6 +48,6 @@ void* my_malloc(unsigned int nbytes) {
           return NULL;
        }
 
-       return list_popfirst(heap->freeb);
+       return list_getfirst(heap->freeb);
     }
 }

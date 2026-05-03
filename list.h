@@ -27,8 +27,6 @@ void list_addfirst(List* list, void* data);
 
 void list_addlast(List* list, void* data);
 
-void* list_popfirst(List* list);
-
 void* list_getfirst(List* list);
 
 void* list_getlast(List* list);

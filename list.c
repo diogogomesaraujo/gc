@@ -85,12 +85,6 @@ bool list_contains(List* list, void* val) {
     return list_contains_rec(list->first, val);
 }
 
-void* list_popfirst(List* list) {
-    void *to_return =list_getfirst(list);
-    list_removefirst(list);
-    return to_return;
-}
-
 void list_removefirst(List* list) {
    if(list_isempty(list))
       return;

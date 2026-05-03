@@ -23,6 +23,8 @@ void mark(BiTreeNode *n) {
 }
 
 void sweep() {
+    list_removeall(heap->freeb);
+
     char* top = heap->top;
     char* base = heap->base;
 
