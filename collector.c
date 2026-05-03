@@ -34,12 +34,32 @@ void sweep() {
 
         void* data = (void*)(bh + sizeof(_block_header));
 
-        if (!bhh->marked) {
-            list_addlast(heap->freeb, data);
-        };
+        if (!bhh->marked) list_addlast(heap->freeb, data);
 
         bhh->marked = false;
     }
+}
+
+void compute_locations() {
+    char* limit = heap->top;
+    char* free = heap->base;
+    char* base = heap->base;
+
+    for (char *bh = base;
+        (char*) bh < limit;
+        bh += sizeof(_block_header) + ((_block_header*) bh)->size)
+    {
+        _block_header *bhh = (_block_header*) bh;
+
+        if (!bhh->marked) {
+            //bhh->forward_pointer = (void*) free;
+            free += sizeof(_block_header) + ((_block_header*) bh)->size;
+        }
+    }
+}
+
+void compact() {
+    compute_locations();
 }
 
 void mark_sweep_gc(BisTree* roots) {

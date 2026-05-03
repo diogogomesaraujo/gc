@@ -49,7 +49,7 @@ void* my_malloc(unsigned int nbytes) {
 
        if (list_isempty(heap->freeb)) {
           printf("my_malloc: not enough space after GC...");
-          return NULL;
+          exit(0);
        }
 
        return list_popfirst(heap->freeb);
