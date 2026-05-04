@@ -43,7 +43,7 @@ void sweep() {
 
 void* compute_locations() {
     char* limit = heap->top;
-    char* free = heap->base;
+    char* free = heap->base + sizeof(_block_header);
     char* base = heap->base;
 
     for (char *bh = base;
@@ -58,7 +58,7 @@ void* compute_locations() {
         }
     }
 
-    return free;
+    return free - sizeof(_block_header);
 }
 
 void update_references() {
@@ -109,16 +109,16 @@ void relocate() {
 
         if (bhh->marked) {
             bhh->marked = false;
-            memmove(bhh->forward_pointer, bhh, bhh->size + sizeof(_block_header));
+            memmove(bhh->forward_pointer - sizeof(_block_header), bhh, bhh->size + sizeof(_block_header));
         }
     }
 }
 
 void compact() {
-    char* top = (char*) compute_locations();
+    char* free = (char*) compute_locations();
     update_references();
     relocate();
-    heap->top = top;
+    heap->top = free;
 }
 
 void mark_sweep_gc(BisTree* roots) {
