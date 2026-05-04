@@ -5,11 +5,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <signal.h>
 
-#include "bool.h"
 #include "heap.h"
-#include "list.h"
 #include "bistree.h"
 #include "globals.h"
 #include "collector.h"
@@ -25,7 +22,7 @@ int main(int argc, char** argv) {
 
    /* initialize the heap space used to store tree nodes */
    heap  = (Heap*)malloc(sizeof(Heap));
-   heap_init(heap, HEAP_SIZE, mark_sweep_gc);
+   heap_init(heap, HEAP_SIZE, mark_compact_gc);
 
    /* initialize set of tree roots */
    roots = (BisTree*)malloc(max_roots * sizeof(BisTree));

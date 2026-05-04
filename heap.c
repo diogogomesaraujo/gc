@@ -10,7 +10,6 @@
 #include "heap.h"
 #include "bistree.h"
 #include "globals.h"
-#include "collector.h"
 #include "list.h"
 
 
@@ -47,6 +46,15 @@ void* my_malloc(unsigned int nbytes) {
         printf("my_malloc: not enough space, performing GC...");
 
         heap->collector(roots);
+
+        if(heap->top + sizeof(_block_header) + nbytes < heap->limit) {
+           _block_header* q = (_block_header*)(heap->top);
+           q->marked = 0;
+           q->size   = nbytes;
+           char *p = heap->top + sizeof(_block_header);
+           heap->top = heap->top + sizeof(_block_header) + nbytes;
+           return p;
+        }
 
         if (list_isempty(heap->freeb)) {
             printf("my_malloc: not enough space after GC...");

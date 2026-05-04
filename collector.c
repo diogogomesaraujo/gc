@@ -5,7 +5,7 @@
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
-
+#include <string.h>
 #include "bistree.h"
 #include "heap.h"
 #include "globals.h"
@@ -39,6 +39,86 @@ void sweep() {
 
         bhh->marked = false;
     }
+}
+
+void* compute_locations() {
+    char* limit = heap->top;
+    char* free = heap->base;
+    char* base = heap->base;
+
+    for (char *bh = base;
+        (char*) bh < limit;
+        bh += sizeof(_block_header) + ((_block_header*) bh)->size)
+    {
+        _block_header *bhh = (_block_header*) bh;
+
+        if (bhh->marked) {
+            bhh->forward_pointer = (void*) free;
+            free += sizeof(_block_header) + ((_block_header*) bh)->size;
+        }
+    }
+
+    return free;
+}
+
+void update_references() {
+    // update roots
+    for (int i = 0; i < max_roots; i++) {
+        BiTreeNode* data = roots[i].root;
+        if (data == NULL) continue;
+
+        _block_header *bh = (_block_header*) ((void*) roots[i].root - sizeof(_block_header));
+        roots[i].root = (BiTreeNode*) bh->forward_pointer;
+    }
+
+    // update fields
+    char* top = heap->top;
+    char* base = heap->base;
+
+    for (char *bh = base;
+        (char*) bh < top;
+        bh += sizeof(_block_header) + ((_block_header*) bh)->size)
+    {
+        _block_header *bhh = (_block_header*) bh;
+
+        if (bhh->marked) {
+            BiTreeNode *data = (BiTreeNode*) ((void*) bhh + sizeof(_block_header));
+
+            if (data->left != NULL) {
+                _block_header *left = (_block_header*) ((void*)data->left - sizeof(_block_header));
+                data->left = (BiTreeNode*) left->forward_pointer;
+            }
+
+            if (data->right != NULL) {
+                _block_header *right = (_block_header*) ((void*) data->right - sizeof(_block_header));
+                data->right = (BiTreeNode*) right->forward_pointer;
+            }
+        }
+    }
+}
+
+void relocate() {
+    char* top = heap->top;
+    char* base = heap->base;
+
+    for (char *bh = base;
+        (char*) bh < top;
+        bh += sizeof(_block_header) + ((_block_header*) bh)->size)
+    {
+        _block_header *bhh = (_block_header*) bh;
+
+        if (bhh->marked) {
+            bhh->marked = false;
+            memmove(bhh->forward_pointer, bhh, bhh->size + sizeof(_block_header));
+        }
+    }
+}
+
+void compact() {
+    char* top = (char*) compute_locations();
+    update_references();
+    relocate();
+    heap->top = top;
 }
 
 void mark_sweep_gc(BisTree* roots) {
@@ -75,12 +155,21 @@ void mark_compact_gc(BisTree* roots) {
     * mark reachable
     */
 
+   printf("marking()...");
+
+   for (int i = 0; i < max_roots; i++) mark(roots[i].root);
+
    /*
     * compact phase:
     * go through entire heap,
     * compute new addresses
     * copy objects to new addresses
     */
+
+   printf("compacting()...");
+
+   compact();
+
    printf("gcing()...\n");
    return;
  }

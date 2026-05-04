@@ -2,10 +2,11 @@
  * bistree.h
  */
 
+#include "bool.h"
+
 #ifndef BISTREE_H
 #define BISTREE_H
 
-#include "bool.h"
 
 typedef struct BiTreeNode_ {
    int                  data;
