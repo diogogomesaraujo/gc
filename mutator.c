@@ -22,7 +22,17 @@ int main(int argc, char** argv) {
 
    /* initialize the heap space used to store tree nodes */
    heap  = (Heap*)malloc(sizeof(Heap));
+   #ifdef _MS
+   heap_init(heap, HEAP_SIZE, mark_sweep_gc);
+   #endif
+
+   #ifdef _MC
    heap_init(heap, HEAP_SIZE, mark_compact_gc);
+   #endif
+
+   #ifdef _CC
+   heap_init(heap, HEAP_SIZE, copy_collection_gc);
+   #endif
 
    /* initialize set of tree roots */
    roots = (BisTree*)malloc(max_roots * sizeof(BisTree));

@@ -11,7 +11,9 @@
 typedef struct {
    unsigned int marked;
    unsigned int size;
+   #ifdef _MC
    void* forward_pointer;
+   #endif
 } _block_header;
 
 typedef struct {

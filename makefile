@@ -51,7 +51,19 @@ $(EXE): $(OBJFLS)
 
 all:
 	make -f $(MAKNAM) clean
-	make -f $(MAKNAM) $(EXE)
+	make -f $(MAKNAM) CFLAGS="$(CFLAGS) -D_MS" $(EXE)
+
+ms:
+	make -f $(MAKNAM) clean
+	make -f $(MAKNAM) CFLAGS="$(CFLAGS) -D_MS" $(EXE)
+
+mc:
+	make -f $(MAKNAM) clean
+	make -f $(MAKNAM) CFLAGS="$(CFLAGS) -D_MC" $(EXE)
+
+cc:
+	make -f $(MAKNAM) clean
+	make -f $(MAKNAM) CFLAGS="$(CFLAGS) -D_CC" $(EXE)
 
 clean:
 	-rm $(EXE)

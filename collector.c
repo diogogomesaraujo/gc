@@ -23,6 +23,7 @@ void mark(BiTreeNode *n) {
     mark(n->left);
 }
 
+#ifdef _MS
 void sweep() {
     char* top = heap->top;
     char* base = heap->base;
@@ -40,7 +41,9 @@ void sweep() {
         bhh->marked = false;
     }
 }
+#endif
 
+#ifdef _MC
 void* compute_locations() {
     char* limit = heap->top;
     char* free = heap->base + sizeof(_block_header);
@@ -109,7 +112,7 @@ void relocate() {
 
         if (bhh->marked) {
             bhh->marked = false;
-            memmove(bhh->forward_pointer - sizeof(_block_header), bhh, bhh->size + sizeof(_block_header));
+            memcpy(bhh->forward_pointer - sizeof(_block_header), bhh, bhh->size + sizeof(_block_header));
         }
     }
 }
@@ -120,7 +123,9 @@ void compact() {
     relocate();
     heap->top = free;
 }
+#endif
 
+#ifdef _MS
 void mark_sweep_gc(BisTree* roots) {
    /*
     * mark phase
@@ -146,7 +151,9 @@ void mark_sweep_gc(BisTree* roots) {
    printf("gcing()...\n");
    return;
  }
+#endif
 
+#ifdef _MC
 void mark_compact_gc(BisTree* roots) {
    /*
     * mark phase:
@@ -173,7 +180,9 @@ void mark_compact_gc(BisTree* roots) {
    printf("gcing()...\n");
    return;
  }
+#endif
 
+#ifdef _CC
 void copy_collection_gc(BisTree* roots) {
    /*
     * go throught all roots,
@@ -183,3 +192,4 @@ void copy_collection_gc(BisTree* roots) {
    printf("gcing()...\n");
    return;
 }
+#endif
