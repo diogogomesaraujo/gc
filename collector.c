@@ -11,6 +11,7 @@
 #include "globals.h"
 #include "list.h"
 
+#if defined(_MS) || defined(_MC)
 void mark(BiTreeNode *n) {
     if (n == NULL) return;
 
@@ -22,6 +23,7 @@ void mark(BiTreeNode *n) {
     mark(n->right);
     mark(n->left);
 }
+#endif
 
 #ifdef _MS
 void sweep() {
@@ -123,6 +125,9 @@ void compact() {
     relocate();
     heap->top = free;
 }
+#endif
+
+#ifdef _CC
 #endif
 
 #ifdef _MS
