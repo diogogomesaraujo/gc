@@ -127,8 +127,59 @@ void compact() {
 }
 #endif
 
-#ifdef _CC
-#endif
+//#ifdef _CC
+void clear() {
+    char* base = heap->from_space;
+    char* top = heap->limit;
+
+    for (char *bh = base;
+        (char*) bh < top;
+        bh += sizeof(_block_header) + ((_block_header*) bh)->size)
+    {
+        _block_header *bhh = (_block_header*) bh;
+        bhh->forward_pointer = NULL;
+    }
+}
+
+void flip() {
+    char* temp = heap->from_space;
+    heap->from_space = heap->to_space;
+    heap->to_space = temp;
+
+    heap->top = heap->to_space;
+    heap->limit = heap->to_space + heap->size / 2;
+}
+
+void *copy_ref(void* from_ref) {
+    void *to_ref = (void*) heap->top;
+    heap->top += sizeof(_block_header) + sizeof(BiTreeNode);
+
+    _block_header *bh = (_block_header*) (from_ref - sizeof(_block_header));
+    memcpy(to_ref, bh, sizeof(_block_header) + sizeof(BiTreeNode));
+
+    return to_ref + sizeof(_block_header);
+}
+
+void *copy_tree(BiTreeNode* root) {
+    if (root == NULL) return root;
+
+    _block_header *bh = (_block_header*) ((void*) root - sizeof(_block_header));
+
+    if (bh->forward_pointer != NULL) return bh->forward_pointer;
+
+    BiTreeNode *to_ref = (BiTreeNode*) copy_ref(root);
+
+    bh->forward_pointer = (void*) to_ref;
+
+    to_ref->left = copy_tree(root->left);
+    to_ref->right = copy_tree(root->right);
+
+    _block_header *bh_to = (_block_header*) ((void*) to_ref - sizeof(_block_header));
+    bh_to->forward_pointer = NULL;
+
+    return (void*) to_ref;
+}
+//#endif
 
 #ifdef _MS
 void mark_sweep_gc(BisTree* roots) {
@@ -187,14 +238,30 @@ void mark_compact_gc(BisTree* roots) {
  }
 #endif
 
-#ifdef _CC
+//#ifdef _CC
 void copy_collection_gc(BisTree* roots) {
    /*
     * go throught all roots,
     * traverse trees in from_space,
     * copy reachable to to_space
     */
+
+   //flip
+
+   flip();
+
+   // clear from_space forward pointers
+
+   clear();
+
+   // update roots recursively
+
+   printf("copying()...");
+
+   for (int i = 0; i < max_roots; i++)
+       roots[i].root = copy_tree(roots[i].root);
+
    printf("gcing()...\n");
    return;
 }
-#endif
+//#endif

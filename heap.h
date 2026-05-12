@@ -11,9 +11,9 @@
 typedef struct {
    unsigned int marked;
    unsigned int size;
-   #if defined(_MC) || defined(_CC)
+   //#if defined(_MC) || defined(_CC)
    void* forward_pointer;
-   #endif
+   //#endif
 } _block_header;
 
 typedef struct {
@@ -21,10 +21,10 @@ typedef struct {
    char*        base;
    char*        top;
    char*        limit;
-   #ifdef _CC
+   //#ifdef _CC
    char*        to_space;
    char*        from_space;
-   #endif
+   //#endif
    List*        freeb;
    void (*collector)(BisTree*);
 } Heap;

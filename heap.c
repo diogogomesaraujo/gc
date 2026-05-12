@@ -22,6 +22,13 @@ void heap_init(Heap* heap, unsigned int size, void (*collector)(BisTree*)){
     heap->freeb = (List*)malloc(sizeof(List));
     list_init(heap->freeb);
     heap->collector = collector;
+
+    #ifdef _CC
+    heap->to_space = heap->base;
+    heap->from_space = heap->base + heap->size / 2;
+    heap->limit = heap->base + size / 2;
+    #endif
+
     return;
 }
 
@@ -35,6 +42,9 @@ void* my_malloc(unsigned int nbytes) {
        _block_header* q = (_block_header*)(heap->top);
        q->marked = 0;
        q->size   = nbytes;
+       #ifdef _CC
+       q->forward_pointer = NULL;
+       #endif
        char *p = heap->top + sizeof(_block_header);
        heap->top = heap->top + sizeof(_block_header) + nbytes;
        return p;
@@ -51,6 +61,9 @@ void* my_malloc(unsigned int nbytes) {
            _block_header* q = (_block_header*)(heap->top);
            q->marked = 0;
            q->size   = nbytes;
+           #ifdef _CC
+           q->forward_pointer = NULL;
+           #endif
            char *p = heap->top + sizeof(_block_header);
            heap->top = heap->top + sizeof(_block_header) + nbytes;
            return p;
