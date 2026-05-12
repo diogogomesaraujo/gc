@@ -127,7 +127,7 @@ void compact() {
 }
 #endif
 
-//#ifdef _CC
+#ifdef _CC
 void clear() {
     char* base = heap->from_space;
     char* top = heap->limit;
@@ -179,7 +179,7 @@ void *copy_tree(BiTreeNode* root) {
 
     return (void*) to_ref;
 }
-//#endif
+#endif
 
 #ifdef _MS
 void mark_sweep_gc(BisTree* roots) {
@@ -238,7 +238,7 @@ void mark_compact_gc(BisTree* roots) {
  }
 #endif
 
-//#ifdef _CC
+#ifdef _CC
 void copy_collection_gc(BisTree* roots) {
    /*
     * go throught all roots,
@@ -264,4 +264,4 @@ void copy_collection_gc(BisTree* roots) {
    printf("gcing()...\n");
    return;
 }
-//#endif
+#endif

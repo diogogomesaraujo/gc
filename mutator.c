@@ -12,6 +12,7 @@
 #include "collector.h"
 
 #define  MAX_KEY_VALUE  15
+
 #define  HEAP_SIZE      (2 * 1024)  /* 2 KByte */
 
 int main(int argc, char** argv) {
