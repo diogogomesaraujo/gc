@@ -128,18 +128,6 @@ void compact() {
 #endif
 
 #ifdef _CC
-void clear() {
-    char* base = heap->from_space;
-    char* top = heap->limit;
-
-    for (char *bh = base;
-        (char*) bh < top;
-        bh += sizeof(_block_header) + ((_block_header*) bh)->size)
-    {
-        _block_header *bhh = (_block_header*) bh;
-        bhh->forward_pointer = NULL;
-    }
-}
 
 void flip() {
     char* temp = heap->from_space;
@@ -249,10 +237,6 @@ void copy_collection_gc(BisTree* roots) {
    //flip
 
    flip();
-
-   // clear from_space forward pointers
-
-   clear();
 
    // update roots recursively
 
