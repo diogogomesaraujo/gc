@@ -19,8 +19,10 @@ void heap_init(Heap* heap, unsigned int size, void (*collector)(BisTree*)){
     heap->size  = size;
     heap->limit = heap->base + size;
     heap->top   = heap->base;
+    #ifdef _MS
     heap->freeb = (List*)malloc(sizeof(List));
     list_init(heap->freeb);
+    #endif
     heap->collector = collector;
 
     #ifdef _CC
@@ -51,7 +53,9 @@ void* my_malloc(unsigned int nbytes) {
     } else {
         printf("my_malloc: not enough space in heap, checking freeb list...");
 
+        #ifdef _MS
         if (!list_isempty(heap->freeb)) return list_popfirst(heap->freeb);
+        #endif
 
         printf("my_malloc: not enough space, performing GC...");
 
@@ -69,11 +73,15 @@ void* my_malloc(unsigned int nbytes) {
            return p;
         }
 
+        #ifdef _MS
         if (list_isempty(heap->freeb)) {
             printf("my_malloc: not enough space after GC...");
             return NULL;
         }
-
-       return list_popfirst(heap->freeb);
+        return list_popfirst(heap->freeb);
+        #else
+        printf("my_malloc: not enough space after GC...");
+        return NULL;
+        #endif
     }
 }
