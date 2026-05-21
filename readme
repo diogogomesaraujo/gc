@@ -8,3 +8,8 @@ $ ./mutator 0.9 100 100000
 to clean and leave just the source code
 
 $ make -f makefile clean
+
+optimizations:
+- offset instead of saving the whole pointer
+- use header instead of freeb
+- make header smaller

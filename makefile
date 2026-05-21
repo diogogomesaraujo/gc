@@ -16,23 +16,37 @@ LIBFLS =
 
 # *  Define the source files.                                                *
 
-SRCFLS = mutator.c\
+VM_SRCFLS = vm.c\
          collector.c\
 	     heap.c\
          bistree.c\
-		 list.c
+		 list.c\
+
+MUTATOR_SRCFLS = mutator.c\
+         collector.c\
+         heap.c\
+         bistree.c\
+         list.c\
 
 # *  Define the object files.                                                *
 
-OBJFLS = mutator.o\
+VM_OBJFLS = vm.o\
          collector.o\
          heap.o\
          bistree.o\
-	     list.o
+	     list.o\
+
+MUTATOR_OBJFLS = mutator.o\
+         collector.o\
+         heap.o\
+         bistree.o\
+         list.o\
 
 # *  Define the executable.                                                  *
 
-EXE    = mutator
+MUTATOR_EXE    = mutator
+
+VM_EXE         = vm
 
 # *  Define the compile and link options.                                    *
 
@@ -43,31 +57,39 @@ LFLAGS =
 
 # *  Define the rules.                                                       *
 
-$(EXE): $(OBJFLS)
-	$(LL) $(LFLAGS) $(OBJFLS) -o $@ $(LIBDRS) $(LIBFLS)
+$(VM_EXE): $(VM_OBJFLS)
+	$(LL) $(LFLAGS) $(VM_OBJFLS) -o $@ $(LIBDRS) $(LIBFLS)
+
+$(MUTATOR_EXE): $(MUTATOR_OBJFLS)
+	$(LL) $(LFLAGS) $(MUTATOR_OBJFLS) -o $@ $(LIBDRS) $(LIBFLS)
 
 .c.o:
 	$(CC) $(CFLAGS) $(INCDRS) -c $<
 
 all:
 	make -f $(MAKNAM) clean
-	make -f $(MAKNAM) CFLAGS="$(CFLAGS) -D_MS" $(EXE)
+	make -f $(MAKNAM) CFLAGS="$(CFLAGS) -D_MS" $(VM_EXE)
+	make -f $(MAKNAM) CFLAGS="$(CFLAGS) -D_MS" $(MUTATOR_EXE)
 
 ms:
 	make -f $(MAKNAM) clean
-	make -f $(MAKNAM) CFLAGS="$(CFLAGS) -D_MS" $(EXE)
+	make -f $(MAKNAM) CFLAGS="$(CFLAGS) -D_MS" $(VM_EXE)
+	make -f $(MAKNAM) CFLAGS="$(CFLAGS) -D_MS" $(MUTATOR_EXE)
 
 mc:
 	make -f $(MAKNAM) clean
-	make -f $(MAKNAM) CFLAGS="$(CFLAGS) -D_MC" $(EXE)
+	make -f $(MAKNAM) CFLAGS="$(CFLAGS) -D_MC" $(VM_EXE)
+	make -f $(MAKNAM) CFLAGS="$(CFLAGS) -D_MC" $(MUTATOR_EXE)
 
 cc:
-	make -f $(MAKNAM) clean
-	make -f $(MAKNAM) CFLAGS="$(CFLAGS) -D_CC" $(EXE)
+	make -f $(MAKNAM) CFLAGS="$(CFLAGS) -D_CC" $(VM_EXE)
+	make -f $(MAKNAM) CFLAGS="$(CFLAGS) -D_CC" $(MUTATOR_EXE)
 
 clean:
-	-rm $(EXE)
-	-rm $(OBJFLS)
+	-rm $(VM_EXE)
+	-rm $(MUTATOR_EXE)
+	-rm $(VM_OBJFLS)
+	-rm $(MUTATOR_OBJFLS)
 
 # DO NOT DELETE THIS LINE -- make depend depends on it.
 

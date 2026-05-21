@@ -128,7 +128,6 @@ void compact() {
 #endif
 
 #ifdef _CC
-
 void flip() {
     char* temp = heap->from_space;
     heap->from_space = heap->to_space;
