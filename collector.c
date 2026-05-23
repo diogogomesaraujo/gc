@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stddef.h>
 #include "bistree.h"
 #include "heap.h"
 #include "globals.h"
@@ -20,8 +21,14 @@ void mark(BiTreeNode *n) {
     if (bh->marked) return;
     bh->marked = true;
 
-    mark(n->right);
-    mark(n->left);
+    BiTreeNode **blocks = (BiTreeNode**) n;
+    char i              = 0;
+
+    while (i < pointers_size(bh->pointers)) {
+        if (is_pointer(bh->pointers, i))
+            mark(blocks[i]);
+        i++;
+    }
 }
 #endif
 

@@ -39,17 +39,22 @@ void heap_destroy(Heap* heap) {
     return;
 }
 
+void* init_block(unsigned int nbytes) {
+    _block_header* q = (_block_header*)(heap->top);
+    q->marked = 0;
+    q->size   = nbytes;
+    #ifdef _CC
+    q->forward_pointer = NULL;
+    #endif
+    q->pointers = INIT_TREE_POINTER_SIZE | TREE_POINTERS;
+    char *p = heap->top + sizeof(_block_header);
+    heap->top = heap->top + sizeof(_block_header) + nbytes;
+    return p;
+}
+
 void* my_malloc(unsigned int nbytes) {
     if( heap->top + sizeof(_block_header) + nbytes < heap->limit ) {
-       _block_header* q = (_block_header*)(heap->top);
-       q->marked = 0;
-       q->size   = nbytes;
-       #ifdef _CC
-       q->forward_pointer = NULL;
-       #endif
-       char *p = heap->top + sizeof(_block_header);
-       heap->top = heap->top + sizeof(_block_header) + nbytes;
-       return p;
+       return init_block(nbytes);
     } else {
         printf("my_malloc: not enough space in heap, checking freeb list...");
 
@@ -62,15 +67,7 @@ void* my_malloc(unsigned int nbytes) {
         heap->collector(roots);
 
         if(heap->top + sizeof(_block_header) + nbytes < heap->limit) {
-           _block_header* q = (_block_header*)(heap->top);
-           q->marked = 0;
-           q->size   = nbytes;
-           #ifdef _CC
-           q->forward_pointer = NULL;
-           #endif
-           char *p = heap->top + sizeof(_block_header);
-           heap->top = heap->top + sizeof(_block_header) + nbytes;
-           return p;
+            return init_block(nbytes);
         }
 
         #ifdef _MS

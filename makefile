@@ -16,17 +16,12 @@ LIBFLS =
 
 # *  Define the source files.                                                *
 
-VM_SRCFLS = vm.c\
+SRCFLS = vm.c\
          collector.c\
 	     heap.c\
          bistree.c\
 		 list.c\
-
-MUTATOR_SRCFLS = mutator.c\
-         collector.c\
-         heap.c\
-         bistree.c\
-         list.c\
+	     mutator.c\
 
 # *  Define the object files.                                                *
 
@@ -82,6 +77,7 @@ mc:
 	make -f $(MAKNAM) CFLAGS="$(CFLAGS) -D_MC" $(MUTATOR_EXE)
 
 cc:
+	make -f $(MAKNAM) clean
 	make -f $(MAKNAM) CFLAGS="$(CFLAGS) -D_CC" $(VM_EXE)
 	make -f $(MAKNAM) CFLAGS="$(CFLAGS) -D_CC" $(MUTATOR_EXE)
 
