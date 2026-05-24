@@ -22,13 +22,10 @@ void mark(BiTreeNode *n) {
     bh->marked = true;
 
     BiTreeNode **blocks = (BiTreeNode**) n;
-    char i              = 0;
 
-    while (i < pointers_size(bh->pointers)) {
+    for (char i = 0; i < pointers_size(bh->pointers); i++)
         if (is_pointer(bh->pointers, i))
             mark(blocks[i]);
-        i++;
-    }
 }
 #endif
 
@@ -96,14 +93,13 @@ void update_references() {
         if (bhh->marked) {
             BiTreeNode *data = (BiTreeNode*) ((void*) bhh + sizeof(_block_header));
 
-            if (data->left != NULL) {
-                _block_header *left = (_block_header*) ((void*)data->left - sizeof(_block_header));
-                data->left = (BiTreeNode*) left->forward_pointer;
-            }
+            BiTreeNode **blocks = (BiTreeNode**) data;
 
-            if (data->right != NULL) {
-                _block_header *right = (_block_header*) ((void*) data->right - sizeof(_block_header));
-                data->right = (BiTreeNode*) right->forward_pointer;
+            for (char i = 0; i < pointers_size(bhh->pointers); i++) {
+                if (is_pointer(bhh->pointers, i) && blocks[i] != NULL) {
+                    _block_header *p = (_block_header*) ((void*)blocks[i] - sizeof(_block_header));
+                    blocks[i] = (BiTreeNode*) p->forward_pointer;
+                }
             }
         }
     }
@@ -165,8 +161,12 @@ void *copy_tree(BiTreeNode* root) {
 
     bh->forward_pointer = (void*) to_ref;
 
-    to_ref->left = copy_tree(root->left);
-    to_ref->right = copy_tree(root->right);
+    BiTreeNode **to_ref_blocks = (BiTreeNode**) to_ref;
+    BiTreeNode **blocks = (BiTreeNode**) root;
+
+    for (char i = 0; i < pointers_size(bh->pointers); i++)
+        if (is_pointer(bh->pointers, i))
+            to_ref_blocks[i] = copy_tree(blocks[i]);
 
     _block_header *bh_to = (_block_header*) ((void*) to_ref - sizeof(_block_header));
     bh_to->forward_pointer = NULL;
