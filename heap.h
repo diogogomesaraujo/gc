@@ -17,9 +17,9 @@
 
 typedef struct {
    unsigned int marked;
-   unsigned int size;
+   char         size;
    void*        forward_pointer;
-   char pointers;
+   char         pointers;
 } _block_header;
 
 typedef struct {

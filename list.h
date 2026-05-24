@@ -9,6 +9,7 @@
 
 typedef struct ListNode_ {
    void*               data;
+   char                size;
    struct ListNode_*   next;
 } ListNode;
 
@@ -23,9 +24,9 @@ int list_size(List* list);
 
 bool list_isempty(List* list);
 
-void list_addfirst(List* list, void* data);
+void list_addfirst(List* list, void* data, char size);
 
-void list_addlast(List* list, void* data);
+void list_addlast(List* list, void* data, char size);
 
 void* list_getfirst(List* list);
 

@@ -42,7 +42,7 @@ void sweep() {
 
         void* data = (void*)(bh + sizeof(_block_header));
 
-        if (!bhh->marked) list_addfirst(heap->freeb, data);
+        if (!bhh->marked) list_addfirst(heap->freeb, data, bhh->size);
 
         bhh->marked = false;
     }

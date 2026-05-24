@@ -24,19 +24,21 @@ bool list_isempty(List* list) {
    return (list->size == 0);
 }
 
-void list_addfirst(List* list, void* data) {
+void list_addfirst(List* list, void* data, char size) {
   ListNode* node = (ListNode*)malloc(sizeof(ListNode));
   node->data = data;
   node->next = list->first;
+  node->size = size;
   list->first= node;
   list->size = list->size + 1;
   return;
 }
 
-void list_addlast(List* list, void* data) {
+void list_addlast(List* list, void* data, char size) {
   ListNode* node = (ListNode*)malloc(sizeof(ListNode));
   node->data = data;
   node->next = NULL;
+  node->size = size;
   if(list_isempty(list)) {
      list->first = node;
   }
