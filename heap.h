@@ -32,7 +32,7 @@ typedef struct {
    char*        from_space;
    #endif
    #ifdef _MS
-   List*        freeb;
+   void*        freeb;
    #endif
    void (*collector)(BisTree*);
 } Heap;

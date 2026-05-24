@@ -20,8 +20,7 @@ void heap_init(Heap* heap, unsigned int size, void (*collector)(BisTree*)){
     heap->limit = heap->base + size;
     heap->top   = heap->base;
     #ifdef _MS
-    heap->freeb = (List*)malloc(sizeof(List));
-    list_init(heap->freeb);
+    heap->freeb = NULL;
     #endif
     heap->collector = collector;
 
@@ -52,6 +51,30 @@ void* init_block(unsigned int nbytes) {
     return p;
 }
 
+#ifdef _MS
+void* freeb_pop(char nbytes) {
+    void *p = heap->freeb;
+    void *prev = NULL;
+
+    while (p != NULL) {
+        _block_header *bh = (_block_header*) p;
+        if (bh->size >= nbytes) break;
+
+        prev = p;
+        p = bh->forward_pointer;
+    }
+
+    _block_header *bh = (_block_header*) p;
+
+    if (prev != NULL) {
+        _block_header *bh_prev = (_block_header*) prev;
+        bh_prev->forward_pointer = bh->forward_pointer;
+    } else heap->freeb = (void*) bh->forward_pointer;
+
+    return (void*) bh + sizeof(_block_header);
+}
+#endif
+
 void* my_malloc(unsigned int nbytes) {
     if( heap->top + sizeof(_block_header) + nbytes < heap->limit ) {
        return init_block(nbytes);
@@ -59,7 +82,8 @@ void* my_malloc(unsigned int nbytes) {
         printf("my_malloc: not enough space in heap, checking freeb list...");
 
         #ifdef _MS
-        if (!list_isempty(heap->freeb)) return list_popfirst(heap->freeb);
+        if (heap->freeb != NULL)
+            return freeb_pop(nbytes);
         #endif
 
         printf("my_malloc: not enough space, performing GC...");
@@ -71,11 +95,11 @@ void* my_malloc(unsigned int nbytes) {
         }
 
         #ifdef _MS
-        if (list_isempty(heap->freeb)) {
+        if (heap->freeb == NULL) {
             printf("my_malloc: not enough space after GC...");
             return NULL;
         }
-        return list_popfirst(heap->freeb);
+        return freeb_pop(nbytes);
         #else
         printf("my_malloc: not enough space after GC...");
         return NULL;

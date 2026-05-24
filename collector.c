@@ -34,15 +34,18 @@ void sweep() {
     char* top = heap->top;
     char* base = heap->base;
 
+    heap->freeb = NULL;
+
     for (char *bh = base;
         (char*) bh < top;
         bh = bh + sizeof(_block_header) + ((_block_header*) bh)->size)
     {
         _block_header *bhh = (_block_header*) bh;
 
-        void* data = (void*)(bh + sizeof(_block_header));
-
-        if (!bhh->marked) list_addfirst(heap->freeb, data, bhh->size);
+        if (!bhh->marked) {
+            bhh->forward_pointer = heap->freeb;
+            heap->freeb = (void*) bhh;
+        }
 
         bhh->marked = false;
     }
