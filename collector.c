@@ -13,7 +13,7 @@
 #include "list.h"
 
 #if defined(_MS) || defined(_MC)
-void mark(BiTreeNode *n) {
+void mark(void *n) {
     if (n == NULL) return;
 
     _block_header *bh = (_block_header*) ((char*) n - sizeof(_block_header));
@@ -21,7 +21,7 @@ void mark(BiTreeNode *n) {
     if (bh->marked) return;
     bh->marked = true;
 
-    BiTreeNode **blocks = (BiTreeNode**) n;
+    typeof(n) **blocks = (typeof(n)**) n;
 
     for (char i = 0; i < pointers_size(bh->pointers); i++)
         if (is_pointer(bh->pointers, i))
@@ -76,11 +76,11 @@ void* compute_locations() {
 void update_references() {
     // update roots
     for (int i = 0; i < max_roots; i++) {
-        BiTreeNode* data = roots[i].root;
+        typeof(roots[i].root)* data = roots[i].root;
         if (data == NULL) continue;
 
         _block_header *bh = (_block_header*) ((void*) roots[i].root - sizeof(_block_header));
-        roots[i].root = (BiTreeNode*) bh->forward_pointer;
+        roots[i].root = (typeof(roots[i].root)*) bh->forward_pointer;
     }
 
     // update fields
@@ -94,9 +94,10 @@ void update_references() {
         _block_header *bhh = (_block_header*) bh;
 
         if (bhh->marked) {
-            BiTreeNode *data = (BiTreeNode*) ((void*) bhh + sizeof(_block_header));
+            void* data_ptr = (void*) bhh + sizeof(_block_header);
+            typeof(data_ptr) *data = (typeof(data_ptr)*) data_ptr;
 
-            BiTreeNode **blocks = (BiTreeNode**) data;
+            typeof(data_ptr) **blocks = (typeof(data_ptr)**) data;
 
             for (char i = 0; i < pointers_size(bhh->pointers); i++) {
                 if (is_pointer(bhh->pointers, i) && blocks[i] != NULL) {
@@ -160,12 +161,12 @@ void *copy_tree(BiTreeNode* root) {
 
     if (bh->forward_pointer != NULL) return bh->forward_pointer;
 
-    BiTreeNode *to_ref = (BiTreeNode*) copy_ref(root);
+    typeof(root) *to_ref = (typeof(root)*) copy_ref(root);
 
     bh->forward_pointer = (void*) to_ref;
 
-    BiTreeNode **to_ref_blocks = (BiTreeNode**) to_ref;
-    BiTreeNode **blocks = (BiTreeNode**) root;
+    typeof(root) **to_ref_blocks = (typeof(root)**) to_ref;
+    typeof(root) **blocks = (typeof(root)**) root;
 
     for (char i = 0; i < pointers_size(bh->pointers); i++)
         if (is_pointer(bh->pointers, i))
@@ -243,7 +244,7 @@ void copy_collection_gc(BisTree* roots) {
     * copy reachable to to_space
     */
 
-   //flip
+   // flip
 
    flip();
 
