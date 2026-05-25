@@ -31,12 +31,12 @@ void mark(void *n) {
 
 #ifdef _MS
 void sweep() {
-    unsigned int top  = heap->top;
-    unsigned int base = 0;
+    gc_pointer top  = heap->top;
+    gc_pointer base = 0;
 
     heap->freeb = NONE;
 
-    for (unsigned int bh = base;
+    for (gc_pointer bh = base;
         bh < top;
         bh = bh + sizeof(_block_header) + ((_block_header*) offset_to_pointer(bh))->size)
     {
@@ -53,12 +53,12 @@ void sweep() {
 #endif
 
 #ifdef _MC
-unsigned int compute_locations() {
-    unsigned int limit = heap->top;
-    unsigned int free  = sizeof(_block_header);
-    unsigned int base  = 0;
+gc_pointer compute_locations() {
+    gc_pointer limit = heap->top;
+    gc_pointer free  = sizeof(_block_header);
+    gc_pointer base  = 0;
 
-    for (unsigned int bh = base;
+    for (gc_pointer bh = base;
         bh < limit;
         bh += sizeof(_block_header) + ((_block_header*) offset_to_pointer(bh))->size)
     {
@@ -84,10 +84,10 @@ void update_references() {
     }
 
     // update fields
-    unsigned int top  = heap->top;
-    unsigned int base = 0;
+    gc_pointer top  = heap->top;
+    gc_pointer base = 0;
 
-    for (unsigned int bh = base;
+    for (gc_pointer bh = base;
         bh < top;
         bh += sizeof(_block_header) + ((_block_header*) offset_to_pointer(bh))->size)
     {
@@ -110,10 +110,10 @@ void update_references() {
 }
 
 void relocate() {
-    unsigned int top = heap->top;
-    unsigned int base = 0;
+    gc_pointer top = heap->top;
+    gc_pointer base = 0;
 
-    for (unsigned int bh = base;
+    for (gc_pointer bh = base;
         bh < top;
         bh += sizeof(_block_header) + ((_block_header*) offset_to_pointer(bh))->size)
     {
@@ -127,7 +127,7 @@ void relocate() {
 }
 
 void compact() {
-    unsigned int free = compute_locations();
+    gc_pointer free = compute_locations();
     update_references();
     relocate();
     heap->top = free;
@@ -136,11 +136,11 @@ void compact() {
 
 #ifdef _CC
 void flip() {
-    unsigned int temp = heap->from_space;
+    gc_pointer   temp = heap->from_space;
     heap->from_space  = heap->to_space;
     heap->to_space    = temp;
 
-    heap->top = heap->to_space;
+    heap->top   = heap->to_space;
     heap->limit = heap->to_space + heap->size / 2;
 }
 

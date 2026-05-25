@@ -53,8 +53,8 @@ void* init_block(unsigned int nbytes) {
 
 #ifdef _MS
 void* freeb_pop(char nbytes) {
-    unsigned int p    = heap->freeb;
-    unsigned int prev = NONE;
+    gc_pointer p    = heap->freeb;
+    gc_pointer prev = NONE;
 
     while (p != NONE) {
         _block_header *bh = (_block_header*) offset_to_pointer(p);

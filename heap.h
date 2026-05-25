@@ -20,24 +20,26 @@
 #define TREE_BLOCK_NUMBER 3
 #define INIT_TREE_POINTER_SIZE (3 << 4)
 
+typedef unsigned int gc_pointer;
+
 typedef struct {
    unsigned int  marked;
    char          size;
-   unsigned int  forward_pointer;
+   gc_pointer    forward_pointer;
    char          pointers;
 } _block_header;
 
 typedef struct {
    unsigned int  size;
    char*         base;
-   unsigned int  top;
-   unsigned int  limit;
+   gc_pointer    top;
+   gc_pointer    limit;
    #ifdef _CC
-   unsigned int  to_space;
-   unsigned int  from_space;
+   gc_pointer    to_space;
+   gc_pointer    from_space;
    #endif
    #ifdef _MS
-   unsigned int  freeb;
+   gc_pointer    freeb;
    #endif
    void (*collector)(BisTree*);
 } Heap;
