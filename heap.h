@@ -7,32 +7,37 @@
 
 #include "list.h"
 #include "bistree.h"
+#include <limits.h>
 
-#define is_pointer(p, i) (p >> i) & 1
+#define is_pointer(p, i) ((p >> i) & 1)
 #define pointers_size(p) (p >> 4)
 
+#define offset_to_pointer(o) ((void*)heap->base + o)
+#define pointer_to_offset(p) ((unsigned int)((void*)(p) - (void*)heap->base))
+
+#define NONE UINT_MAX
 #define TREE_POINTERS 6
 #define TREE_BLOCK_NUMBER 3
 #define INIT_TREE_POINTER_SIZE (3 << 4)
 
 typedef struct {
-   unsigned int marked;
-   char         size;
-   void*        forward_pointer;
-   char         pointers;
+   unsigned int  marked;
+   char          size;
+   unsigned int  forward_pointer;
+   char          pointers;
 } _block_header;
 
 typedef struct {
-   unsigned int size;
-   char*        base;
-   char*        top;
-   char*        limit;
+   unsigned int  size;
+   char*         base;
+   unsigned int  top;
+   unsigned int  limit;
    #ifdef _CC
-   char*        to_space;
-   char*        from_space;
+   unsigned int  to_space;
+   unsigned int  from_space;
    #endif
    #ifdef _MS
-   void*        freeb;
+   unsigned int  freeb;
    #endif
    void (*collector)(BisTree*);
 } Heap;
