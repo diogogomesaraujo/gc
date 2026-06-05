@@ -23,22 +23,19 @@
 
 /* constants */
 
-#define HEAP_SIZE        (2 * 1024)  /* 2 KByte */
+#define HEAP_SIZE (2 * 1024)  /* 2 KByte */
 
-int      VM_threshold;
-int      VM_loop_counter;
-int      VM_roots_size;
-int      VM_stack_size;
-int      VM_stack_top;
-int      VM_max_rounds;
-int*     VM_stack;
-Heap*    VM_heap;
-char*    VM_program;
-BisTree* VM_roots;
+int            VM_threshold;
+int            VM_loop_counter;
+int            VM_stack_size;
+int            VM_stack_top;
+int            VM_max_rounds;
+int*           VM_stack;
+unsigned char* VM_program;
 
 int main(int argc, char* argv[]) {
     if (argc < 5) {
-        printf("arguments should be: ./vm <threshold> <roots_size> <max rounds> <stack_size>");
+        printf("**gc-virtual-machine**  arguments should be: ./vm <threshold> <roots_size> <max rounds> <stack_size>");
         exit(0);
     }
 
@@ -46,11 +43,11 @@ int main(int argc, char* argv[]) {
     VM_threshold = atoi(argv[1]);
 
     /* initialize roots */
-    VM_roots_size = atoi(argv[2]);
-    VM_roots = (BisTree*)malloc(VM_roots_size * sizeof(BisTree));
+    max_roots = atoi(argv[2]);
+    roots = (BisTree*)malloc(max_roots * sizeof(BisTree));
 
-    for (int i = 0; i < VM_roots_size; i++)
-         bistree_init(&VM_roots[i]);
+    for (int i = 0; i < max_roots; i++)
+         bistree_init(&roots[i]);
 
     /* max rounds */
     VM_max_rounds = atoi(argv[3]);
@@ -61,21 +58,21 @@ int main(int argc, char* argv[]) {
     VM_stack_top = 0;
 
     /* initialize the heap */
-    VM_heap = (Heap*)malloc(sizeof(Heap));
+    heap = (Heap*)malloc(sizeof(Heap));
     #ifdef _MS
-    heap_init(VM_heap, HEAP_SIZE, mark_sweep_gc);
+    heap_init(heap, HEAP_SIZE, mark_sweep_gc);
     #endif
 
     #ifdef _MC
-    heap_init(VM_heap, HEAP_SIZE, mark_compact_gc);
+    heap_init(heap, HEAP_SIZE, mark_compact_gc);
     #endif
 
     #ifdef _CC
-    heap_init(VM_heap, HEAP_SIZE, copy_collection_gc);
+    heap_init(heap, HEAP_SIZE, copy_collection_gc);
     #endif
 
     /* initialize program */
-    VM_program = (char[]) {
+    VM_program = (unsigned char[]) {
         LLP,  0xc4,
         RND,  0x14,
         SEL,  PAD,
@@ -84,16 +81,16 @@ int main(int argc, char* argv[]) {
         DEL,  PAD,
         J,    0x10,
         ADD,  PAD,
-        LLP,  PAD,
         JLP,  0x02,
         QUIT, 0x00
     };
 
     /* run program */
-    char* pc = VM_program;
+    unsigned char* pc = VM_program;
 
     for (int i = 0; i < VM_max_rounds; i++) {
-        char opcode = pc[0];
+        unsigned char opcode = pc[0];
+
         int number;
         BisTree* root;
 
@@ -102,7 +99,9 @@ int main(int argc, char* argv[]) {
                 /* llp */
                 VM_loop_counter = pc[1];
                 pc = pc + 2;
-                printf("executing lpp\n");
+
+                printf("**gc-virtual-machine**    executing lpp: loop_counter = %d, pc = %p\n", VM_loop_counter, pc);
+
                 break;
 
             case JLP:
@@ -110,29 +109,30 @@ int main(int argc, char* argv[]) {
                 VM_loop_counter--;
 
                 if (VM_loop_counter != 0)
-                    pc = &VM_program[(int) pc[1]];
+                    pc = &VM_program[pc[1]];
                 else
                     pc = pc + 2;
 
-                printf("executing jpl\n");
+                printf("**gc-virtual-machine**    executing jpl: pc = %p\n", pc);
+
                 break;
 
             case J:
                 /* j */
-                pc = &VM_program[(int) pc[1]];
+                pc = &VM_program[pc[1]];
 
-                printf("executing j\n");
+                printf("**gc-virtual-machine**    executing j: pc = %p\n", pc);
+
                 break;
 
             case BLT:
                 /* blt */
                 if (VM_stack[--VM_stack_top] < VM_threshold) {
-                    printf("executing blt\n");
-                    pc = &VM_program[(int) pc[1]];
+                    pc = &VM_program[pc[1]];
                 }
-                else
-                    printf("executing blt\n");
-                    pc = pc + 2;
+                else pc = pc + 2;
+
+                printf("**gc-virtual-machine**    executing blt: pc = %p, stack_top = %d\n", pc, VM_stack_top);
 
                 break;
 
@@ -141,50 +141,56 @@ int main(int argc, char* argv[]) {
                 VM_stack[VM_stack_top++] = rand() % pc[1];
                 pc = pc + 2;
 
-                printf("executing rnd\n");
+                printf("**gc-virtual-machine**    executing blt: stack_top = %d, pc = %p\n", VM_stack[VM_stack_top], pc);
+
                 break;
 
             case SEL:
                 /* sel */
-                VM_stack[VM_stack_top++] = rand() % VM_roots_size;
+                VM_stack[VM_stack_top++] = rand() % max_roots;
                 pc = pc + 2;
 
-                printf("executing sel\n");
+                printf("**gc-virtual-machine**    executing sel: stack_top = %d, pc = %p\n", VM_stack[VM_stack_top], pc);
                 break;
 
             case ADD:
                 /* add */
-                number = VM_stack[VM_stack_top - 1];
-                root = &VM_roots[VM_stack[VM_stack_top - 2]];
+                number = VM_stack[VM_stack_top - 2];
+
+                int index = VM_stack[VM_stack_top - 1];
+                root = &roots[index];
 
                 bistree_insert(root, number);
 
                 VM_stack_top = VM_stack_top - 2;
                 pc = pc + 2;
 
-                printf("executing add\n");
+                printf("**gc-virtual-machine**    executing add: number = %d, root = %p, stack_top = %d, pc = %p\n", number, root, VM_stack[VM_stack_top], pc);
+
                 break;
 
             case DEL:
                 /* del */
-                number = VM_stack[VM_stack_top - 1];
-                root = &VM_roots[VM_stack[VM_stack_top - 2]];
+                number = VM_stack[VM_stack_top - 2];
+                root = &roots[VM_stack[VM_stack_top - 1]];
 
                 bistree_remove(root, number);
 
                 VM_stack_top = VM_stack_top - 2;
                 pc = pc + 2;
 
-                printf("executing del\n");
+                printf("**gc-virtual-machine**    executing del: number = %d, root = %p, stack_top = %d, pc = %p\n", number, root, VM_stack[VM_stack_top], pc);
+
                 break;
 
             case QUIT:
                 /* quit */
+                printf("**gc-virtual-machine**    see you space cowboy!\n");
                 exit(0);
 
             default:
                 /* error, exit */
-                printf("%x: unkown opcode\n", opcode);
+                printf("**gc-virtual-machine**    %x: unkown opcode\n", opcode);
                 exit(1);
         }
     }

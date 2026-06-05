@@ -12,7 +12,6 @@
 #include "globals.h"
 #include "list.h"
 
-
 void heap_init(Heap* heap, unsigned int size, void (*collector)(BisTree*)){
     heap->base  = mmap ( NULL, size, PROT_READ | PROT_WRITE,
                          MAP_PRIVATE | MAP_ANONYMOUS, 0, 0 );
@@ -39,14 +38,14 @@ void heap_destroy(Heap* heap) {
 }
 
 void* init_block(unsigned int nbytes) {
-    _block_header* q = (_block_header*)(offset_to_pointer(heap->top));
+    _block_header* q = (_block_header*)(deref(heap->top));
     q->marked = 0;
     q->size   = nbytes;
     #ifdef _CC
     q->forward_pointer = NONE;
     #endif
     q->pointers = INIT_TREE_POINTER_SIZE | TREE_POINTERS;
-    char *p = offset_to_pointer(heap->top) + sizeof(_block_header);
+    char *p = deref(heap->top) + sizeof(_block_header);
     heap->top = heap->top + sizeof(_block_header) + nbytes;
     return p;
 }
@@ -57,17 +56,17 @@ void* freeb_pop(char nbytes) {
     gc_pointer prev = NONE;
 
     while (p != NONE) {
-        _block_header *bh = (_block_header*) offset_to_pointer(p);
+        _block_header *bh = (_block_header*) deref(p);
         if (bh->size >= nbytes) break;
 
         prev = p;
         p = bh->forward_pointer;
     }
 
-    _block_header *bh = (_block_header*) offset_to_pointer(p);
+    _block_header *bh = (_block_header*) deref(p);
 
     if (prev != NONE) {
-        _block_header *bh_prev = (_block_header*) offset_to_pointer(prev);
+        _block_header *bh_prev = (_block_header*) deref(prev);
         bh_prev->forward_pointer = bh->forward_pointer;
     } else heap->freeb = bh->forward_pointer;
 
@@ -79,15 +78,16 @@ void* my_malloc(unsigned int nbytes) {
     if( heap->top + sizeof(_block_header) + nbytes < heap->limit ) {
        return init_block(nbytes);
     } else {
-        printf("my_malloc: not enough space in heap, checking freeb list...");
+        printf("**malloc**                not enough space in heap, checking freeb list...\n");
 
         #ifdef _MS
         if (heap->freeb != NONE)
             return freeb_pop(nbytes);
         #endif
 
-        printf("my_malloc: not enough space, performing GC...");
+        printf("**malloc**                not enough space, performing GC...\n");
 
+        printf("**malloc**                ");
         heap->collector(roots);
 
         if(heap->top + sizeof(_block_header) + nbytes < heap->limit) {
@@ -96,12 +96,12 @@ void* my_malloc(unsigned int nbytes) {
 
         #ifdef _MS
         if (heap->freeb == NONE) {
-            printf("my_malloc: not enough space after GC...");
+            printf("**malloc**                not enough space after GC..\n.");
             return NULL;
         }
         return freeb_pop(nbytes);
         #else
-        printf("my_malloc: not enough space after GC...");
+        printf("**malloc**                not enough space after GC...\n");
         return NULL;
         #endif
     }

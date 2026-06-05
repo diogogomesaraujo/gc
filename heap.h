@@ -12,8 +12,8 @@
 #define is_pointer(p, i) ((p >> i) & 1)
 #define pointers_size(p) (p >> 4)
 
-#define offset_to_pointer(o) ((void*)heap->base + o)
-#define pointer_to_offset(p) ((unsigned int)((void*)(p) - (void*)heap->base))
+#define deref(o) ((void*)heap->base + o)
+#define toref(p) ((unsigned int)((void*)(p) - (void*)heap->base))
 
 #define NONE UINT_MAX
 #define TREE_POINTERS 6

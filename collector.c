@@ -38,13 +38,13 @@ void sweep() {
 
     for (gc_pointer bh = base;
         bh < top;
-        bh = bh + sizeof(_block_header) + ((_block_header*) offset_to_pointer(bh))->size)
+        bh = bh + sizeof(_block_header) + ((_block_header*) deref(bh))->size)
     {
-        _block_header *bhh = (_block_header*) offset_to_pointer(bh);
+        _block_header *bhh = (_block_header*) deref(bh);
 
         if (!bhh->marked) {
             bhh->forward_pointer = heap->freeb;
-            heap->freeb = pointer_to_offset((void*) bhh);
+            heap->freeb = toref((void*) bhh);
         }
 
         bhh->marked = false;
@@ -60,9 +60,9 @@ gc_pointer compute_locations() {
 
     for (gc_pointer bh = base;
         bh < limit;
-        bh += sizeof(_block_header) + ((_block_header*) offset_to_pointer(bh))->size)
+        bh += sizeof(_block_header) + ((_block_header*) deref(bh))->size)
     {
-        _block_header *bhh = (_block_header*) offset_to_pointer(bh);
+        _block_header *bhh = (_block_header*) deref(bh);
 
         if (bhh->marked) {
             bhh->forward_pointer = free;
@@ -80,7 +80,7 @@ void update_references() {
         if (data == NULL) continue;
 
         _block_header *bh = (_block_header*) ((void*) roots[i].root - sizeof(_block_header));
-        roots[i].root = (typeof(roots[i].root)*) offset_to_pointer(bh->forward_pointer);
+        roots[i].root = (typeof(roots[i].root)*) deref(bh->forward_pointer);
     }
 
     // update fields
@@ -89,9 +89,9 @@ void update_references() {
 
     for (gc_pointer bh = base;
         bh < top;
-        bh += sizeof(_block_header) + ((_block_header*) offset_to_pointer(bh))->size)
+        bh += sizeof(_block_header) + ((_block_header*) deref(bh))->size)
     {
-        _block_header *bhh = (_block_header*) offset_to_pointer(bh);
+        _block_header *bhh = (_block_header*) deref(bh);
 
         if (bhh->marked) {
             void* data_ptr = (void*) bhh + sizeof(_block_header);
@@ -102,7 +102,7 @@ void update_references() {
             for (char i = 0; i < pointers_size(bhh->pointers); i++) {
                 if (is_pointer(bhh->pointers, i) && blocks[i] != NULL) {
                     _block_header *p = (_block_header*) ((void*)blocks[i] - sizeof(_block_header));
-                    blocks[i] = (BiTreeNode*) offset_to_pointer(p->forward_pointer);
+                    blocks[i] = (BiTreeNode*) deref(p->forward_pointer);
                 }
             }
         }
@@ -115,13 +115,13 @@ void relocate() {
 
     for (gc_pointer bh = base;
         bh < top;
-        bh += sizeof(_block_header) + ((_block_header*) offset_to_pointer(bh))->size)
+        bh += sizeof(_block_header) + ((_block_header*) deref(bh))->size)
     {
-        _block_header *bhh = (_block_header*) offset_to_pointer(bh);
+        _block_header *bhh = (_block_header*) deref(bh);
 
         if (bhh->marked) {
             bhh->marked = false;
-            memcpy(offset_to_pointer(bhh->forward_pointer) - sizeof(_block_header), bhh, bhh->size + sizeof(_block_header));
+            memcpy(deref(bhh->forward_pointer) - sizeof(_block_header), bhh, bhh->size + sizeof(_block_header));
         }
     }
 }
@@ -145,7 +145,7 @@ void flip() {
 }
 
 void *copy_ref(void* from_ref) {
-    void *to_ref = offset_to_pointer(heap->top);
+    void *to_ref = deref(heap->top);
     heap->top += sizeof(_block_header) + sizeof(BiTreeNode);
 
     _block_header *bh = (_block_header*) (from_ref - sizeof(_block_header));
@@ -159,11 +159,11 @@ void *copy_tree(BiTreeNode* root) {
 
     _block_header *bh = (_block_header*) ((void*) root - sizeof(_block_header));
 
-    if (bh->forward_pointer != NONE) return offset_to_pointer(bh->forward_pointer);
+    if (bh->forward_pointer != NONE) return deref(bh->forward_pointer);
 
     typeof(root) *to_ref = (typeof(root)*) copy_ref(root);
 
-    bh->forward_pointer = pointer_to_offset(to_ref);
+    bh->forward_pointer = toref(to_ref);
 
     typeof(root) **to_ref_blocks = (typeof(root)**) to_ref;
     typeof(root) **blocks = (typeof(root)**) root;
