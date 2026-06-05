@@ -22,6 +22,7 @@ SRCFLS = vm.c\
          bistree.c\
 		 list.c\
 	     mutator.c\
+		 lib.c\
 
 # *  Define the object files.                                                *
 
@@ -30,6 +31,7 @@ VM_OBJFLS = vm.o\
          heap.o\
          bistree.o\
 	     list.o\
+		 lib.o\
 
 MUTATOR_OBJFLS = mutator.o\
          collector.o\
@@ -49,6 +51,9 @@ CC     = gcc
 LL     = gcc
 CFLAGS = -Wall
 LFLAGS =
+
+# *  Define the lib name to export ot OCaml                                  *
+LIB_NAME = vm.so
 
 # *  Define the rules.                                                       *
 
@@ -81,11 +86,18 @@ cc:
 	make -f $(MAKNAM) CFLAGS="$(CFLAGS) -D_CC" $(VM_EXE)
 	make -f $(MAKNAM) CFLAGS="$(CFLAGS) -D_CC" $(MUTATOR_EXE)
 
+lib:
+	make -f $(MAKNAM) clean
+	make -f $(MAKNAM) CFLAGS="$(CFLAGS) -D_CC" $(VM_EXE)
+	$(LL) -shared -o $(LIB_NAME) $(VM_OBJFLS)
+
+
 clean:
 	-rm $(VM_EXE)
 	-rm $(MUTATOR_EXE)
 	-rm $(VM_OBJFLS)
 	-rm $(MUTATOR_OBJFLS)
+	-rm $(LIB_NAME)
 
 # DO NOT DELETE THIS LINE -- make depend depends on it.
 

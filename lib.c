@@ -21,10 +21,6 @@
 #define DEL  0x08 /* deletes integer Stack[top-1] from tree Roots[Stack[top-2]] */
 #define QUIT 0x09 /* exits the program */
 
-/* constants */
-
-#define HEAP_SIZE (2 * 1024)  /* 2 KByte */
-
 /* globals */
 
 int            VM_threshold;
@@ -35,42 +31,43 @@ int            VM_max_rounds;
 int*           VM_stack;
 unsigned char* VM_program;
 
-int main(int argc, char* argv[]) {
-    if (argc < 5) {
-        printf("**gc-virtual-machine**  arguments should be: ./vm <threshold> <roots_size> <max rounds> <stack_size>");
-        exit(0);
-    }
-
+void vm(int            heap_size,
+        int            threshold_arg,
+        int            max_roots_arg,
+        int            max_rounds_arg,
+        int            stack_size_arg,
+        unsigned char* program,
+        int            program_size) {
     /* initialize threshold */
-    VM_threshold = atoi(argv[1]);
+    VM_threshold = threshold_arg;
 
     /* initialize roots */
-    max_roots = atoi(argv[2]);
+    max_roots = max_roots_arg;
     roots = (BisTree*)malloc(max_roots * sizeof(BisTree));
 
     for (int i = 0; i < max_roots; i++)
          bistree_init(&roots[i]);
 
     /* max rounds */
-    VM_max_rounds = atoi(argv[3]);
+    VM_max_rounds = max_rounds_arg;
 
     /* initialize stack */
-    VM_stack_size = atoi(argv[4]);
+    VM_stack_size = stack_size_arg;
     VM_stack = (int*)malloc(VM_stack_size * sizeof(int));
     VM_stack_top = 0;
 
     /* initialize the heap */
     heap = (Heap*)malloc(sizeof(Heap));
     #ifdef _MS
-    heap_init(heap, HEAP_SIZE, mark_sweep_gc);
+    heap_init(heap, heap_size, mark_sweep_gc);
     #endif
 
     #ifdef _MC
-    heap_init(heap, HEAP_SIZE, mark_compact_gc);
+    heap_init(heap, heap_size, mark_compact_gc);
     #endif
 
     #ifdef _CC
-    heap_init(heap, HEAP_SIZE, copy_collection_gc);
+    heap_init(heap, heap_size, copy_collection_gc);
     #endif
 
     /* initialize program */
@@ -196,6 +193,4 @@ int main(int argc, char* argv[]) {
                 exit(1);
         }
     }
-
-    return 0;
 }

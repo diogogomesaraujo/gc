@@ -57,3 +57,5 @@ vm
 # debug information files
 *.dwo
 mutator
+
+_build/

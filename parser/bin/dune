@@ -1,0 +1,4 @@
+(executable
+ (public_name gc_parser)
+ (name main)
+ (libraries gc_parser))

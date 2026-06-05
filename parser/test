@@ -1,0 +1,10 @@
+        LLP;  0xc4;
+        RND;  0x14;
+        SEL;
+        RND;  0xc4;
+        BLT;  0x0e;
+        DEL;
+        J;    0x10;
+        ADD;
+        JLP;  0x02;
+        QUIT;
