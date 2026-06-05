@@ -50,16 +50,14 @@ int main(int argc, char** argv) {
       if( toss > threshold ) {
          /* add integer to one of the roots */
          if (!bistree_insert(aroot, random() % MAX_KEY_VALUE)) continue;
-         fprintf(stdout, "tree size is %d\n", bistree_size(aroot));
-         fprintf(stdout, "[%d] (inorder traversal adding)\n", i);
-         bistree_inorder(aroot);
+         fprintf(stdout, "**mutator**               tree size is %d\n", bistree_size(aroot));
+         fprintf(stdout, "**mutator**               [%d] (inorder traversal adding)\n", i);
       }
       else {
          /* remove integer from one of the roots */
          if(!bistree_remove(aroot, random() % MAX_KEY_VALUE)) continue;
-         fprintf(stdout, "tree size is %d\n", bistree_size(aroot));
-         fprintf(stdout, "[%d] (inorder traversal removing)\n", i);
-         bistree_inorder(aroot);
+         fprintf(stdout, "**mutator**               tree size is %d\n", bistree_size(aroot));
+         fprintf(stdout, "**mutator**               [%d] (inorder traversal removing)\n", i);
       }
    }
    /* exit gracefully */
