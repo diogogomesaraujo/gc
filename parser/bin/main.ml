@@ -2,13 +2,13 @@ open Gc_parser.Vm
 open Gc_parser.Parse
 open Gc_parser.Ast
 
-let usage_msg = "fun (--repl | <file>) [--trace]"
+let usage_msg = ""
 
 let heap_size   = ref 2048
 let threshold   = ref 80
 let max_roots   = ref 10
-let max_rounds  = ref 1000000000000
-let stack_size  = ref 1000000000000
+let max_rounds  = ref 1000000000
+let stack_size  = ref 1000000000
 
 let input_file = ref ""
 
@@ -30,4 +30,10 @@ let () =
 
   let program = parse_from_file !input_file in
 
-  vm !heap_size !threshold !max_roots !max_rounds !stack_size (char_pointer_of_int_list ~l: (op ~l: program)) (List.length program)
+  vm
+    !heap_size
+    !threshold
+    !max_roots
+    !max_rounds
+    !stack_size
+    (char_pointer_of_int_list ~l: (op ~l: program)) (List.length program)

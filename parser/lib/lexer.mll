@@ -11,7 +11,6 @@ rule read =
     | white { read lexbuf }
     | int { INT (int_of_string (Lexing.lexeme lexbuf))}
     | ";" { COMMA }
-    | "PAD" { PAD }
     | "LLP" { LLP }
     | "JLP" { JLP }
     | "J" { J }

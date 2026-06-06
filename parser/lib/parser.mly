@@ -6,7 +6,6 @@
 
 %token COMMA
 
-%token PAD
 %token LLP
 %token JLP
 %token J

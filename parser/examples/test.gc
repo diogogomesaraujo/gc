@@ -1,0 +1,10 @@
+LLP  196;
+RND  20;
+SEL;
+RND  196;
+BLT  14;
+DEL;
+J    16;
+ADD;
+JLP  2;
+QUIT
