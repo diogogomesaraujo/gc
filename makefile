@@ -86,7 +86,17 @@ cc:
 	make -f $(MAKNAM) CFLAGS="$(CFLAGS) -D_CC" $(VM_EXE)
 	make -f $(MAKNAM) CFLAGS="$(CFLAGS) -D_CC" $(MUTATOR_EXE)
 
-lib:
+lib-ms:
+	make -f $(MAKNAM) clean
+	make -f $(MAKNAM) CFLAGS="$(CFLAGS) -D_MS" $(VM_EXE)
+	$(LL) -shared -o $(LIB_NAME) $(VM_OBJFLS)
+
+lib-mc:
+	make -f $(MAKNAM) clean
+	make -f $(MAKNAM) CFLAGS="$(CFLAGS) -D_MC" $(VM_EXE)
+	$(LL) -shared -o $(LIB_NAME) $(VM_OBJFLS)
+
+lib-cc:
 	make -f $(MAKNAM) clean
 	make -f $(MAKNAM) CFLAGS="$(CFLAGS) -D_CC" $(VM_EXE)
 	$(LL) -shared -o $(LIB_NAME) $(VM_OBJFLS)
