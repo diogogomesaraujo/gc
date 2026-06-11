@@ -38,6 +38,8 @@ void vm(int            heap_size,
         int            stack_size_arg,
         unsigned char* program,
         int            program_size) {
+    VM_program = program;
+
     /* initialize threshold */
     VM_threshold = threshold_arg;
 
@@ -69,20 +71,6 @@ void vm(int            heap_size,
     #ifdef _CC
     heap_init(heap, heap_size, copy_collection_gc);
     #endif
-
-    /* initialize program */
-    VM_program = (unsigned char[]) {
-        LLP,  0xc4,
-        RND,  0x14,
-        SEL,  PAD,
-        RND,  0xc4,
-        BLT,  0x0e,
-        DEL,  PAD,
-        J,    0x10,
-        ADD,  PAD,
-        JLP,  0x02,
-        QUIT, 0x00
-    };
 
     /* run program */
     unsigned char* pc = VM_program;
