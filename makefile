@@ -49,7 +49,7 @@ VM_EXE         = vm
 
 CC     = gcc
 LL     = gcc
-CFLAGS = -Wall
+CFLAGS = -Wall -Os
 LFLAGS =
 
 # *  Define the lib name to export ot OCaml                                  *

@@ -18,8 +18,8 @@ let op ~l =
       | J   i -> acc @ [3; i]
       | Blt i -> acc @ [4; i]
       | Rnd i -> acc @ [5; i]
-      | Sel   -> acc @ [6]
-      | Add   -> acc @ [7]
-      | Del   -> acc @ [8]
-      | Quit  -> acc @ [9]
+      | Sel   -> acc @ [6; 0]
+      | Add   -> acc @ [7; 0]
+      | Del   -> acc @ [8; 0]
+      | Quit  -> acc @ [9; 0]
   ) [] l
