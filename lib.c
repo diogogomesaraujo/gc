@@ -38,6 +38,7 @@ void vm(int            heap_size,
         int            stack_size_arg,
         unsigned char* program,
         int            program_size) {
+    /* initialize program */
     VM_program = program;
 
     /* initialize threshold */

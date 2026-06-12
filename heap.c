@@ -78,9 +78,9 @@ void* my_malloc(unsigned int nbytes) {
     if( heap->top + sizeof(_block_header) + nbytes < heap->limit ) {
        return init_block(nbytes);
     } else {
+        #ifdef _MS
         printf("**malloc**                not enough space in heap, checking freeb list...\n");
 
-        #ifdef _MS
         if (heap->freeb != NONE)
             return freeb_pop(nbytes);
         #endif
